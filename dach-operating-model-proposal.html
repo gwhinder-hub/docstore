@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DACH Client-Facing Application Development — Operating Model Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+
+  /* Header block */
+  .memo-header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .memo-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+
+  .memo-title {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  .memo-subtitle {
+    font-size: 17px;
+    color: #4b5563;
+    font-style: italic;
+  }
+
+  .memo-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 20px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  .memo-meta span { white-space: nowrap; }
+
+  /* Sections */
+  h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-top: 32px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  /* The three-column model */
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0 32px;
+  }
+
+  @media (max-width: 640px) {
+    .model-grid { grid-template-columns: 1fr; }
+  }
+
+  .model-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 20px;
+  }
+
+  .model-card-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .card-dach .model-card-label { color: #0369a1; }
+  .card-centre .model-card-label { color: #7e22ce; }
+  .card-shared .model-card-label { color: #b45309; }
+
+  .model-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .model-card p:last-child { margin-bottom: 0; }
+
+  .model-card strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Gap items */
+  .gap {
+    margin-top: 28px;
+    padding: 24px;
+    background: #fff;
+    border-left: 3px solid #d1d5db;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .gap-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .gap h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .gap p { font-size: 15px; margin-bottom: 12px; }
+  .gap p:last-child { margin-bottom: 0; }
+
+  .action {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e40af;
+    background: #eff6ff;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-top: 12px;
+  }
+
+  .action::before {
+    content: "Action → ";
+    font-weight: 600;
+  }
+
+  /* Cost section */
+  .cost-item {
+    margin-bottom: 16px;
+    padding-left: 18px;
+    border-left: 2px solid #e5e7eb;
+  }
+
+  .cost-item strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+
+  /* Alternative / consequences */
+  .consequence-list {
+    margin: 16px 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .consequence-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .consequence-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #9ca3af;
+    font-weight: 600;
+  }
+
+  /* Next steps */
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 36px;
+    margin-bottom: 14px;
+    font-size: 15px;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    background: #1a1a1a;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Recommendation callout */
+  .recommendation {
+    margin-top: 32px;
+    padding: 28px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+  }
+
+  .recommendation p { font-size: 15px; }
+
+  /* Print */
+  @media print {
+    .page { padding: 20px 0; max-width: 100%; }
+    .gap { box-shadow: none; border: 1px solid #e5e7eb; }
+    .model-grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="memo-header">
+    <div class="memo-label">Internal Memo — TDL Technology</div>
+    <h1 class="memo-title">DACH Client-Facing Application Development</h1>
+    <div class="memo-subtitle">A federated operating model for enabling DACH speed with group alignment</div>
+    <div class="memo-meta">
+      <span>July 2025</span>
+      <span>Status: Draft for discussion</span>
+    </div>
+  </div>
+
+  <h2>Context</h2>
+
+  <p>The DACH business (TDL GmbH) operates a distinct technology stack centred on MemoQ Server, in contrast to the wider group's Trados and offline-MemoQ footprint. The DACH tech and solutions team wants to build client-facing applications on a 3-month delivery horizon, rather than waiting for the group-wide integrated platform roadmap (~12 months).</p>
+
+  <p>The challenge is enabling that speed without creating a shadow IT function that drifts from group standards, duplicates effort, or produces assets the centre can't support long-term.</p>
+
+  <h2>Proposed Model</h2>
+
+  <p>The model splits responsibility across three zones: what DACH owns outright, what the centre provides, and what needs to be negotiated between the two.</p>
+
+  <div class="model-grid">
+    <div class="model-card card-dach">
+      <div class="model-card-label">DACH owns</div>
+      <p><strong>Product direction &amp; sprint planning.</strong> The DACH team defines what gets built and in what order, running their own sprint cadence and backlog with whichever planning tool suits their workflow — provided it meets minimum visibility requirements.</p>
+      <p><strong>A dedicated QA resource.</strong> Embedded in the DACH team for day-to-day test execution, regression testing, and client UAT coordination.</p>
+      <p><strong>Domain expertise.</strong> MemoQ Server configuration, DACH client workflows, German-language UX, and local compliance considerations.</p>
+    </div>
+    <div class="model-card card-centre">
+      <div class="model-card-label">Centre provides</div>
+      <p><strong>DevOps infrastructure.</strong> GitHub organisation, repositories, CI/CD pipelines, environments, secrets management, and deployment tooling. DACH commits code; the centre owns how it gets built, tested, and shipped.</p>
+      <p><strong>QA leadership.</strong> The DACH QA resource reports day-to-day into the DACH team but is managed by the group QA lead — test strategy, quality standards, and career development are centrally governed.</p>
+      <p><strong>Architectural guardrails.</strong> Shared standards for API design, authentication, logging, monitoring, and data handling.</p>
+    </div>
+    <div class="model-card card-shared">
+      <div class="model-card-label">Shared / Negotiated</div>
+      <p><strong>Sprint visibility.</strong> An agreed mechanism for the centre to see what's in flight, what's shipping, and what's blocked.</p>
+      <p><strong>Release governance.</strong> Who approves a production deployment? The authority and escalation path need to be explicit.</p>
+      <p><strong>Incident response.</strong> If a client-facing DACH app goes down at 2am, who gets paged — DACH, central DevOps, or both?</p>
+    </div>
+  </div>
+
+  <h2>Gap Analysis</h2>
+
+  <div class="gap">
+    <div class="gap-number">01</div>
+    <h4>Definition of "client-facing"</h4>
+    <p>This is the biggest unstated risk. A client-facing application carries obligations around uptime, security, data protection (GDPR and Austrian-specific DSGVO interpretation), accessibility, and support. Has the DACH team scoped these non-functional requirements, or is the 3-month target based purely on feature delivery? If the centre is providing the infrastructure, the centre is implicitly underwriting these obligations.</p>
+    <div class="action">Agree a minimum non-functional baseline (uptime target, vulnerability scanning, data residency, logging) before sprint 1.</div>
+  </div>
+
+  <div class="gap">
+    <div class="gap-number">02</div>
+    <h4>DevOps capacity and onboarding</h4>
+    <p>The DACH team has limited DevOps experience — that's precisely why the centre is providing the infrastructure. But "providing GitHub" is not the same as "providing DevOps." Someone needs to set up the repos, configure branch protection, build the CI/CD pipelines, create the environments, and then be available when things break. Is the central DevOps function resourced for this additional demand, or is this being absorbed into existing headcount?</p>
+    <div class="action">Quantify the central DevOps effort required for initial setup (likely 2–4 weeks of focused work) and ongoing support (likely 0.5 FTE equivalent), and confirm capacity.</div>
+  </div>
+
+  <div class="gap">
+    <div class="gap-number">03</div>
+    <h4>QA reporting line tension</h4>
+    <p>A QA resource embedded in DACH but managed by the central QA lead is a matrix arrangement. These work when the two sides are aligned and break when they're not. The likely friction point: DACH sprint pressure says "ship it, it's good enough" and the QA lead says "it hasn't met the test criteria." Who wins?</p>
+    <div class="action">Define the escalation path explicitly. Suggestion: QA lead has a blocking vote on production releases, with escalation to Head of Product if DACH disagrees.</div>
+  </div>
+
+  <div class="gap">
+    <div class="gap-number">04</div>
+    <h4>Sprint visibility mechanism</h4>
+    <p>Whatever planning tool DACH uses, the centre needs a reliable way to see what's in flight, what's shipping, and what's blocked. The specific tool matters less than the commitment to a shared minimum: status, priority, sprint, owner, and type for each work item, and a regular cross-team sync. Without this, "central alignment" is a phrase in a proposal rather than something that actually happens.</p>
+    <div class="action">Agree the visibility mechanism and sync cadence before development starts. This is a condition of the model, not a nice-to-have.</div>
+  </div>
+
+  <div class="gap">
+    <div class="gap-number">05</div>
+    <h4>Architecture alignment without a group CTO</h4>
+    <p>There is no group CTO or individual with formal authority over technology decisions across TDL. This is a known gap and is unlikely to be addressed in the near term. In practice, this means "architectural guardrails" only work if someone is informally empowered to review DACH's technical decisions early enough to course-correct — and if DACH accepts that review as legitimate. Without a CTO mandate, this relies on goodwill and professional respect, which is fine when things are going well and fragile when they're not.</p>
+    <div class="action">Identify the most credible technical individual available and agree — with DACH's buy-in — that they will review key design decisions at the start of each feature. Keep it lightweight: a conversation, not a committee.</div>
+  </div>
+
+  <div class="gap">
+    <div class="gap-number">06</div>
+    <h4>Long-term ownership and technical debt</h4>
+    <p>The 3-month build is the easy part. Who maintains these applications in month 6, month 12, month 24? If the DACH team is small and people leave, does the centre inherit applications it didn't design? The answer is almost certainly yes — so the centre's architectural guardrails aren't just about standards, they're about ensuring future maintainability.</p>
+    <div class="action">Agree that applications built under this model are group assets (not DACH-only), with documentation and code standards that allow another team to pick them up.</div>
+  </div>
+
+  <h2>Cost Allocation</h2>
+
+  <p>This model is not free for DACH. The centre is providing infrastructure and leadership that would otherwise need to be procured independently — and at significantly higher cost if DACH were to stand up its own DevOps function and QA capability from scratch.</p>
+
+  <div class="cost-item">
+    <p><strong>QA lead (proportion of salary/cost).</strong> The group QA lead is managing the DACH QA resource, setting test standards, and providing release governance. DACH should fund a proportion of this role commensurate with the time commitment — likely 20–30% of the QA lead's cost in year one, reviewed annually.</p>
+  </div>
+
+  <div class="cost-item">
+    <p><strong>DevOps support.</strong> Initial setup of the DACH infrastructure (repos, pipelines, environments, access controls) is a discrete piece of work, estimated at 2–4 weeks of focused DevOps effort. Ongoing support — pipeline maintenance, environment management, incident response — is likely to require 0.5 FTE equivalent on a sustained basis. DACH should fund this directly, either as a recharge from the central function or as a ring-fenced allocation in the group DevOps budget.</p>
+  </div>
+
+  <div class="cost-item">
+    <p><strong>Tooling and licensing.</strong> Any incremental licensing costs (GitHub seats, CI/CD compute, monitoring tools, hosting) attributable to DACH applications should sit in the DACH cost centre.</p>
+  </div>
+
+  <p>The principle is straightforward: DACH gets speed and access to capabilities it doesn't have in-house; the centre gets cost recovery and the authority that comes with being the infrastructure provider. Neither side is doing the other a favour — this is a service relationship that should be budgeted and tracked like one.</p>
+
+  <h2>Why This Model — and What Happens Without It</h2>
+
+  <p>The DACH team has stated its intention to build client-facing applications on a 3-month timeline. This will happen whether or not the centre is involved. The question is not <em>whether</em> DACH builds, but whether it builds on shared infrastructure with shared standards, or independently.</p>
+
+  <p>If DACH proceeds without central involvement, the likely outcome is:</p>
+
+  <ul class="consequence-list">
+    <li>Infrastructure set up ad hoc, without CI/CD discipline, environment separation, or secrets management — because the team lacks DevOps experience and won't acquire it in 3 months.</li>
+    <li>No QA governance, meaning quality is assessed by the developers who wrote the code, with predictable results for client-facing reliability.</li>
+    <li>No architectural alignment, meaning that when the group eventually wants to integrate or even understand what DACH has built, it will face a reverse-engineering exercise.</li>
+    <li>No visibility for the centre into what's been shipped, what state it's in, or what obligations it creates.</li>
+    <li>Technical debt that the centre inherits anyway when DACH team members move on or when the group decides to consolidate.</li>
+  </ul>
+
+  <p>The federated model proposed here is not the centre imposing control on DACH. It is the centre offering DACH capabilities it genuinely needs, in exchange for alignment it would otherwise lack. The cost to DACH is modest compared to the alternative of building — or more likely, failing to build — these capabilities independently.</p>
+
+  <h2>Recommendation</h2>
+
+  <div class="recommendation">
+    <p>The model is sound in principle. The key adjustment is to treat this not as "DACH does their thing on our infrastructure" but as <strong>"DACH is the first team to operate under a federated delivery model."</strong> That framing matters because it means the standards, guardrails, and governance put in place now become the template for any future team that wants to move fast without going fully independent.</p>
+    <p style="margin-top: 12px;">The 3-month timeline is achievable for an MVP if the non-functional baseline is scoped tightly and the DevOps setup starts immediately. The risk is not speed — it's the governance gaps turning into firefighting in month 4.</p>
+  </div>
+
+  <h3>Suggested next steps</h3>
+
+  <ol class="steps">
+    <li>Agree the cost allocation model with DACH leadership — QA lead recharge, DevOps support funding, and incremental tooling costs.</li>
+    <li>Central DevOps to scope and schedule the DACH infrastructure setup (repos, pipelines, environments) — aim to have this ready within 2–3 weeks.</li>
+    <li>Group QA lead and DACH team to agree the QA operating model in writing: reporting line, escalation path, release gate authority.</li>
+    <li>DACH to produce a one-page non-functional requirements baseline for review by the centre.</li>
+    <li>Identify the architectural reviewer for DACH and agree the design review format.</li>
+    <li>Agree sprint visibility mechanism and first cross-team sync date.</li>
+  </ol>
+
+</div>
+</body>
+</html>
